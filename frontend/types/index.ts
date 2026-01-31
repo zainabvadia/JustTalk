@@ -1,8 +1,5 @@
 // frontend/types/index.ts
 
-/**
- * Defines the different "screens" or stages of the application.
- */
 export enum AppState {
   SETUP = 'SETUP',
   RECORDING = 'RECORDING',
@@ -10,29 +7,22 @@ export enum AppState {
   RESULTS = 'RESULTS'
 }
 
-/**
- * Data gathered from the ScriptInput component to configure the Teleprompter.
- */
 export interface ScriptData {
   text: string;
-  scrollSpeed: number; // 1-10
-  fontSize: number;    // in px
+  scrollSpeed: number; 
+  fontSize: number;    
 }
 
-/**
- * The final payload generated after recording and AI processing.
- */
 export interface RecordingResult {
+  id: string;              // Required by ResultsView for filenames
   videoBlob: Blob;
   videoUrl: string;
   transcript: string;
   originalScript: string;
-  feedback?: string; // Optional: In case Gemini provides performance notes
+  aiFeedback: string;      // Changed from 'feedback?' to 'aiFeedback' to match component
+  timestamp: number;       // Required for the "Analysis Results" header
 }
 
-/**
- * Helper type for Gemini service responses.
- */
 export interface TranscriptionResponse {
   text: string;
   confidence: number;

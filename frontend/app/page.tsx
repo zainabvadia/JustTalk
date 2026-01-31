@@ -8,7 +8,8 @@ import ProcessingScreen from "@/components/ProcessingScreen";
 import ResultsView from "@/components/ResultsView";
 
 import { AppState, ScriptData, RecordingResult } from "@/types";
-import { transcribeAudio } from "@/services/geminiService";
+// Change: Import the updated service function
+import { processRecordingWithBackend } from "@/services/geminiService";
 
 export default function PracticePage() {
   const [state, setState] = useState<AppState>(AppState.SETUP);
@@ -23,20 +24,27 @@ export default function PracticePage() {
   const finishRecording = async (videoBlob: Blob) => {
     setState(AppState.PROCESSING);
 
-    const transcript = await transcribeAudio(videoBlob);
+    try {
+      // Change: Use the new backend-ready service call
+      // This will send the video to your Java server
+      const analysisResult = await processRecordingWithBackend(
+        videoBlob, 
+        script?.text ?? ""
+      );
 
-    setResult({
-      videoBlob,
-      videoUrl: URL.createObjectURL(videoBlob),
-      transcript,
-      originalScript: script?.text ?? "",
-    });
-
-    setState(AppState.RESULTS);
+      setResult(analysisResult);
+      setState(AppState.RESULTS);
+    } catch (error) {
+      console.error("Recording failed:", error);
+      alert("Failed to process video. Make sure your Java backend is running!");
+      setState(AppState.SETUP); // Fallback to setup on error
+    }
   };
 
   const resetApp = useCallback(() => {
-    if (result?.videoUrl) URL.revokeObjectURL(result.videoUrl);
+    if (result?.videoUrl) {
+      URL.revokeObjectURL(result.videoUrl);
+    }
     setResult(null);
     setScript(null);
     setState(AppState.SETUP);
