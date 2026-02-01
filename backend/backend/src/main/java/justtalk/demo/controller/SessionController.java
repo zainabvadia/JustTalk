@@ -16,9 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+
 @RestController
 @RequestMapping("/api/sessions")
-@CrossOrigin(origins = "http://localhost:3000")
+// @CrossOrigin(origins = "http://localhost:3000")
 public class SessionController {
     private final VideoService videoService;
 
@@ -40,7 +41,7 @@ public class SessionController {
     @PostMapping("/analyze")
     public ResponseEntity<PracticeSession> analyzeSession(
             @RequestParam("video") MultipartFile videoFile,
-            @RequestParam("originalScript") String script
+            @RequestParam("script") String script
     ) {
         try {
             // 1. Get AI Transcript
