@@ -56,12 +56,10 @@ public class SessionController {
             session.setActualTranscript(actualTranscript);
             session.setAccuracyScore(analysis.getAccuracyScore());
             session.setFeedbackJson(mapper.writeValueAsString(analysis));
-
-            // 4. Store Video to DigitalOcean and DB
-            Video videoEntity = videoService.saveFile(videoFile, session.getId());
-
-            // Optionally: link session to videoEntity if you add a relation
-            return ResponseEntity.ok(repository.save(session));
+            session = repository.save(session);
+            
+            videoService.saveFile(videoFile, session.getId());
+            return ResponseEntity.ok(session);
 
         } catch (Exception e) {
             e.printStackTrace();

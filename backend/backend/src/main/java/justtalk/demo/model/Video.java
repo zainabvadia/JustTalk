@@ -14,6 +14,7 @@ public class Video {
     private Long videoId;          // every video has a unique ID -> use to post, get from digital ocean CDN
     
     @Column(nullable = false)
+    @JoinColumn(name = "session_id") 
     private Long sessionId;
 
     @Column(nullable = false)

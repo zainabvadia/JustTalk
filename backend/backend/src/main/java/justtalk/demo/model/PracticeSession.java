@@ -11,8 +11,6 @@ public class PracticeSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    
     
     @Column(columnDefinition = "TEXT")
     private String originalScript;   // What the user WANTED to say

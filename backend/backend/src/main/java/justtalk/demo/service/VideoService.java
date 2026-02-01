@@ -49,6 +49,7 @@ public class VideoService {
         saveVideoToSpaces(file, key);
 
         Video video = new Video();
+        video.setSessionId(sessionId);
         video.setTitle(videoName);
         video.setCreatedAt(LocalDateTime.now());
         video.setLink(doSpaceEndpointForData + "/" + key);

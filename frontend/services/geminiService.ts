@@ -33,15 +33,15 @@ export const processRecordingWithBackend = async (
     console.log("Backend Response:", data);
 
     // Mapping the Java Response to our Frontend RecordingResult type
-    // return {
-    //   id: data.id, 
-    //   videoBlob: videoBlob,
-    //   videoUrl: URL.createObjectURL(videoBlob),
-    //   transcript: data.transcript,
-    //   originalScript: originalScript,
-    //   aiFeedback: data.feedback,
-    //   timestamp: data.createdAt || Date.now(),
-    // };
+    return {
+      id: data.id, 
+      videoBlob: videoBlob,
+      videoUrl: URL.createObjectURL(videoBlob),
+      transcript: data.transcript,
+      originalScript: originalScript,
+      aiFeedback: data.feedback,
+      timestamp: data.createdAt || Date.now(),
+    };
   } catch (error) {
     console.error("Frontend Service Error:", error);
     throw error;
