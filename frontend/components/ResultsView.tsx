@@ -88,7 +88,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ result, onReset }) => {
               <span>✨</span> AI Performance Coaching
             </h3>
             <div className="text-emerald-50/90 leading-relaxed max-w-none">
-              {result.aiFeedback}
+              {result?.aiFeedback ?? "Loading feedback..."}
             </div>
           </div>
 
@@ -100,7 +100,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ result, onReset }) => {
             
             <div className="flex-1 bg-gray-900 p-5 rounded-xl border border-gray-700 overflow-y-auto max-h-[400px] custom-scrollbar">
               <p className="text-gray-200 leading-relaxed whitespace-pre-wrap">
-                {result.transcript}
+                {result?.transcript ?? "Transcript will appear here..."}
               </p>
             </div>
 

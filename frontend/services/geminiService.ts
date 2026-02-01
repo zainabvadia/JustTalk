@@ -24,22 +24,37 @@ export const processRecordingWithBackend = async (
       // the browser will set it automatically with the correct boundary.
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Backend failed to process recording');
+      throw new Error(data.message || 'Backend failed to process recording');
     }
 
-    const data = await response.json();
     console.log("Backend Response:", data);
 
-    // Mapping the Java Response to our Frontend RecordingResult type
+    // reformat JSON AI feedback
+    const feedback = JSON.stringify({
+      "Fluency": data.feedbackJson.accuracyScore || 0,
+      "Non-Lexical Fillers": data.feedbackJson.nonLexicalFillers || 0,
+      "Summary": data.feedbackJson.summary
+    }, null, 2); 
+
+    const lines = [
+      `Fluency: ${parseFloat((data.feedbackJson.accuracyScore ?? 0).toFixed(1))} | `,
+      `Non-Lexical Fillers: ${data.feedbackJson.nonLexicalFillers ?? ""} | `,
+      `Lexical Fillers: ${data.feedbackJson.lexicalCount ?? ""} | `,
+      `Summary: ${data.feedbackJson.summary ?? ""}`
+    ];
+
+    const joinLines = lines.join("\n"); // each key-value on a new line
+
     return {
       id: data.id, 
       videoBlob: videoBlob,
-      videoUrl: URL.createObjectURL(videoBlob),
-      transcript: data.transcript,
+      videoUrl: data.link,
+      transcript: data.actualTranscript,
       originalScript: originalScript,
-      aiFeedback: data.feedback,
+      aiFeedback: joinLines,
       timestamp: data.createdAt || Date.now(),
     };
   } catch (error) {
