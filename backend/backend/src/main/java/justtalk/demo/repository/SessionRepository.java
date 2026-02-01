@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface SessionRepository extends JpaRepository<PracticeSession, Long> {
     // Custom query to find all videos for a specific user
-    List<PracticeSession> findByUserId(String userId);
+    // List<PracticeSession> findByUserId(String userId);
 }

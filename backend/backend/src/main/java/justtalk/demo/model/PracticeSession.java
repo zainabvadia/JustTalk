@@ -12,8 +12,8 @@ public class PracticeSession {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String userId;           // From Auth0
-
+    
+    
     @Column(columnDefinition = "TEXT")
     private String originalScript;   // What the user WANTED to say
 

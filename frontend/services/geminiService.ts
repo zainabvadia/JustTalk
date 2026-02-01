@@ -13,6 +13,7 @@ export const processRecordingWithBackend = async (
   // 'video' matches the @RequestParam("video") in your Java Controller
   formData.append('video', videoBlob, `recording-${Date.now()}.webm`);
   formData.append('script', originalScript);
+  /* NEED TO ADD USERID HERE!!! */
 
   try {
     // Replace this URL with your Java server address (usually port 8080)
