@@ -1,52 +1,56 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { RecordingResult } from '@/types';
 
-/**
- * Sends the recorded video and the script to the Java Backend.
- * The Java backend will handle the Gemini AI logic and PostgreSQL storage.
- */
+// 1. Get the API key from environment variables
+const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "";
+
+// 2. INITIALIZE the genAI instance (This was missing!)
+const genAI = new GoogleGenerativeAI(apiKey);
+
 export const processRecordingWithBackend = async (
   videoBlob: Blob, 
   originalScript: string
 ): Promise<RecordingResult> => {
   const formData = new FormData();
-  // 'video' matches the @RequestParam("video") in your Java Controller
   formData.append('video', videoBlob, `recording-${Date.now()}.webm`);
   formData.append('script', originalScript);
 
-  console.log(formData)
-
   try {
-    // Replace this URL with your Java server address (usually port 8080)
+    // Call your Java Backend
     const response = await fetch('http://localhost:8080/api/sessions/analyze', {
       method: 'POST',
       body: formData,
-      // Note: Do NOT set Content-Type header manually when sending FormData; 
-      // the browser will set it automatically with the correct boundary.
     });
 
     const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Backend failed');
 
-    if (!response.ok) {
-      throw new Error(data.message || 'Backend failed to process recording');
+    let finalFeedback = "";
+
+    // Check if backend analysis succeeded
+    if (data.feedbackJson && data.feedbackJson.summary) {
+      const lines = [
+        `Fluency: ${parseFloat((data.feedbackJson.accuracyScore ?? 0).toFixed(1))} | `,
+        `Non-Lexical Fillers: ${data.feedbackJson.nonLexicalFillers ?? 0} | `,
+        `Summary: ${data.feedbackJson.summary}`
+      ];
+      finalFeedback = lines.join("");
+    } else {
+      // BACKEND FAILED: Use Gemini directly as fallback
+      // Now 'genAI' is defined at the top of the file
+    const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+      
+      const prompt = `
+        You are an expert public speaking coach. Analyze this session:
+        Original Script: "${originalScript}"
+        User Transcript: "${data.actualTranscript}"
+        
+        Provide a 2-sentence encouraging summary and score fluency from 0-100.
+      `;
+
+      const result = await model.generateContent(prompt);
+      finalFeedback = result.response.text();
     }
-
-    console.log("Backend Response:", data);
-
-    // reformat JSON AI feedback
-    const feedback = JSON.stringify({
-      "Fluency": data.feedbackJson.accuracyScore || 0,
-      "Non-Lexical Fillers": data.feedbackJson.nonLexicalFillers || 0,
-      "Summary": data.feedbackJson.summary
-    }, null, 2); 
-
-    const lines = [
-      `Fluency: ${parseFloat((data.feedbackJson.accuracyScore ?? 0).toFixed(1))} | `,
-      `Non-Lexical Fillers: ${data.feedbackJson.nonLexicalFillers ?? ""} | `,
-      `Lexical Fillers: ${data.feedbackJson.lexicalCount ?? ""} | `,
-      `Summary: ${data.feedbackJson.summary ?? ""}`
-    ];
-
-    const joinLines = lines.join("\n"); // each key-value on a new line
 
     return {
       id: data.id, 
@@ -54,7 +58,7 @@ export const processRecordingWithBackend = async (
       videoUrl: data.link,
       transcript: data.actualTranscript,
       originalScript: originalScript,
-      aiFeedback: joinLines,
+      aiFeedback: finalFeedback,
       timestamp: data.createdAt || Date.now(),
     };
   } catch (error) {

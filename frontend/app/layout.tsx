@@ -17,15 +17,17 @@ export const metadata: Metadata = {
   description: "Record videos with an AI-powered teleprompter and Gemini transcription",
 };
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // Step 1: Add suppressHydrationWarning to the <html> tag
+    <html lang="en" suppressHydrationWarning>
       <body
+        // Step 2: Add it to the <body> tag as well for full coverage
+        suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}

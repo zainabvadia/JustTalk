@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { RecordingResult } from '@/types';
+import { History } from 'lucide-react'; // 1. Added the missing icon import
 
 interface ResultsViewProps {
   result: RecordingResult;
@@ -9,8 +10,8 @@ interface ResultsViewProps {
   onViewHistory: () => void;
 }
 
-const ResultsView: React.FC<ResultsViewProps> = ({ result, onReset }) => {
-  // Helper for formatting date
+// 2. Added 'onViewHistory' inside the curly braces here:
+const ResultsView: React.FC<ResultsViewProps> = ({ result, onReset, onViewHistory }) => {
   const dateString = new Date(result.timestamp).toLocaleDateString();
   const timeString = new Date(result.timestamp).toLocaleTimeString([], { 
     hour: '2-digit', 
@@ -44,20 +45,24 @@ const ResultsView: React.FC<ResultsViewProps> = ({ result, onReset }) => {
             {dateString} at {timeString}
           </p>
         </div>
-        <button
-          onClick={onReset}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-bold transition-colors shadow-lg shadow-indigo-500/20"
-        >
-          New Recording
-        </button>
-        <button 
-    onClick={onViewHistory} 
-    className="flex items-center gap-2 bg-slate-800 border border-slate-700 hover:border-indigo-500/50 px-8 py-3 rounded-xl font-bold text-slate-300"
-  >
-    <History className="w-5 h-5" />
-    All Versions
-  </button>
         
+        {/* Buttons Grouped Together */}
+        <div className="flex gap-4">
+          <button 
+            onClick={onViewHistory} 
+            className="flex items-center gap-2 bg-slate-800 border border-slate-700 hover:border-indigo-500/50 px-6 py-2 rounded-lg font-bold text-slate-300 transition-all"
+          >
+            <History className="w-5 h-5" />
+            All Versions
+          </button>
+          
+          <button
+            onClick={onReset}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-bold transition-colors shadow-lg shadow-indigo-500/20"
+          >
+            New Recording
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
@@ -82,7 +87,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({ result, onReset }) => {
 
         {/* Right Column: AI Feedback & Transcript */}
         <div className="xl:col-span-7 space-y-6">
-          {/* AI Coaching Feedback */}
           <div className="bg-emerald-900/20 border border-emerald-500/30 rounded-2xl p-6 shadow-xl">
             <h3 className="text-xl font-bold mb-4 text-emerald-400 flex items-center gap-3">
               <span>✨</span> AI Performance Coaching
@@ -92,7 +96,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({ result, onReset }) => {
             </div>
           </div>
 
-          {/* Transcript */}
           <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-xl flex flex-col min-h-[300px]">
             <h3 className="text-xl font-bold mb-4 text-indigo-400 flex items-center gap-3">
               <span>💬</span> Automatic Transcript
