@@ -94,17 +94,6 @@ const Teleprompter: React.FC<TeleprompterProps> = ({ script, onFinished, onCance
 
     recorder.onstop = () => {
       const blob = new Blob(chunksRef.current, { type: 'video/webm' });
-      // Automatically download the video
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `justtalk-recording-${Date.now()}.webm`;
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }, 100);
       onFinished(blob);
     };
 

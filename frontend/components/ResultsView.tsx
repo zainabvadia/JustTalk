@@ -19,7 +19,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ result, onReset }) => {
   const handleDownloadVideo = () => {
     const a = document.createElement('a');
     a.href = result.videoUrl;
-    a.download = `recording-${result.id}.webm`;
+    a.download = `recording-${result.id}.mp4`;
     a.click();
   };
 
