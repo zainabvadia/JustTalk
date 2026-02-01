@@ -1,71 +1,74 @@
 "use client";
 
-import { useState, useCallback } from "react";
-
-import ScriptInput from "@/components/ScriptInput";
+import { useState } from "react";
+import ScriptInput from "@/components/ScriptInput"; 
 import Teleprompter from "@/components/Teleprompter";
 import ProcessingScreen from "@/components/ProcessingScreen";
 import ResultsView from "@/components/ResultsView";
-
-import { AppState, ScriptData, RecordingResult } from "@/types";
-// Change: Import the updated service function
+import HistoryScreen from '@/components/HistoryScreen';
+import { AppState, ScriptData, RecordingResult, HistoryEntry } from "@/types";
 import { processRecordingWithBackend } from "@/services/geminiService";
 
 export default function PracticePage() {
   const [state, setState] = useState<AppState>(AppState.SETUP);
   const [script, setScript] = useState<ScriptData | null>(null);
   const [result, setResult] = useState<RecordingResult | null>(null);
+  const [historyData, setHistoryData] = useState<HistoryEntry[]>([]);
 
-  const startRecording = (data: ScriptData) => {
-    setScript(data);
-    setState(AppState.RECORDING);
-  };
-
-  const finishRecording = async (videoBlob: Blob) => {
-    setState(AppState.PROCESSING);
-
+  const loadHistory = async () => {
     try {
-      // Change: Use the new backend-ready service call
-      // This will send the video to your Java server
-      const analysisResult = await processRecordingWithBackend(
-        videoBlob, 
-        script?.text ?? ""
-      );
-
-      setResult(analysisResult);
-      setState(AppState.RESULTS);
-    } catch (error) {
-      console.error("Recording failed:", error);
-      alert("Failed to process video. Make sure your Java backend is running!");
-      setState(AppState.SETUP); // Fallback to setup on error
+      const response = await fetch('http://localhost:8080/api/history');
+      const data = await response.json();
+      setHistoryData(data);
+      setState(AppState.HISTORY);
+    } catch (err) {
+      console.error("History fetch error", err);
+      setState(AppState.HISTORY);
     }
   };
-
-  const resetApp = useCallback(() => {
-    if (result?.videoUrl) {
-      URL.revokeObjectURL(result.videoUrl);
-    }
-    setResult(null);
-    setScript(null);
-    setState(AppState.SETUP);
-  }, [result]);
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white">
-      {state === AppState.SETUP && <ScriptInput onStart={startRecording} />}
-
-      {state === AppState.RECORDING && script && (
-        <Teleprompter
-          script={script}
-          onFinished={finishRecording}
-          onCancel={resetApp}
-        />
+    <main className="min-h-screen bg-[#0f172a] text-white flex flex-col items-center justify-center p-6">
+      
+      {(state === AppState.SETUP || state === AppState.HISTORY) && (
+        <div className="w-full max-w-4xl bg-[#1e293b] border border-slate-700 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+          {state === AppState.SETUP ? (
+            <ScriptInput 
+              onStart={(data) => { setScript(data); setState(AppState.RECORDING); }} 
+              onViewHistory={loadHistory} 
+            />
+          ) : (
+            <HistoryScreen 
+              entries={historyData} 
+              onSelect={(entry) => { setResult(entry.result); setState(AppState.RESULTS); }}
+              onBack={() => setState(AppState.SETUP)}
+            />
+          )}
+        </div>
       )}
 
+      {/* Operative Screens */}
+      {state === AppState.RECORDING && script && (
+        <Teleprompter 
+           script={script} 
+           onFinished={async (blob) => {
+             setState(AppState.PROCESSING);
+             const res = await processRecordingWithBackend(blob, script.text);
+             setResult(res);
+             setState(AppState.RESULTS);
+           }} 
+           onCancel={() => setState(AppState.SETUP)} 
+        />
+      )}
+      
       {state === AppState.PROCESSING && <ProcessingScreen />}
-
+      
       {state === AppState.RESULTS && result && (
-        <ResultsView result={result} onReset={resetApp} />
+        <ResultsView 
+          result={result} 
+          onReset={() => setState(AppState.SETUP)}
+          onViewHistory={loadHistory} 
+        />
       )}
     </main>
   );

@@ -1,13 +1,16 @@
-'use client'; // Required for hooks in Next.js App Router
+'use client';
 
 import React, { useState } from 'react';
-import { ScriptData } from '@/types'; // Updated to use your path alias
+import { ScriptData } from '@/types';
+import { History } from 'lucide-react'; // Clean icon library
+import { Scroll } from 'lucide-react';
 
 interface ScriptInputProps {
   onStart: (data: ScriptData) => void;
+  onViewHistory: () => void; // Prop to trigger the history view
 }
 
-const ScriptInput: React.FC<ScriptInputProps> = ({ onStart }) => {
+const ScriptInput: React.FC<ScriptInputProps> = ({ onStart, onViewHistory }) => {
   const [text, setText] = useState('');
   const [scrollSpeed, setScrollSpeed] = useState(5);
   const [fontSize, setFontSize] = useState(32);
@@ -19,30 +22,44 @@ const ScriptInput: React.FC<ScriptInputProps> = ({ onStart }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-gray-800 rounded-2xl shadow-2xl mt-10 border border-gray-700">
-      <h2 className="text-3xl font-bold mb-6 flex items-center gap-3 text-indigo-400">
-        {/* Note: Ensure FontAwesome is loaded in your layout.tsx or use an icon library like lucide-react */}
-        <span className="opacity-80">📜</span> 
-        Teleprompter Setup
-      </h2>
+    <div className="w-full p-8 bg-[#1e293b] rounded-3xl animate-in fade-in zoom-in duration-300">
       
-      <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Header Section with Integrated History Button */}
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-3xl font-bold flex items-center gap-3 text-indigo-400">
+         <Scroll className="w-8 h-8 text-indigo-500 opacity-80" />
+          JustTalk
+          </h2>
+
+        <button 
+          type="button"
+          onClick={onViewHistory}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-indigo-400 hover:border-indigo-500/50 transition-all group text-sm font-semibold"
+        >
+          <History className="w-4 h-4 group-hover:rotate-[-20deg] transition-transform" />
+          Past Versions
+        </button>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-8">
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Your Script</label>
+          <label className="block text-sm font-semibold text-slate-400 mb-3 ml-1 uppercase tracking-wider">
+            Your Script
+          </label>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Paste your script here..."
-            className="w-full h-64 bg-gray-900 border border-gray-700 rounded-xl p-4 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none"
+            className="w-full h-72 bg-[#0f172a] border border-slate-700 rounded-2xl p-6 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none shadow-inner"
             required
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Scroll Speed Control */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2 flex justify-between">
-              Scroll Speed <span>{scrollSpeed}</span>
+          <div className="space-y-4">
+            <label className="text-sm font-semibold text-slate-400 flex justify-between px-1">
+              SCROLL SPEED <span>{scrollSpeed}</span>
             </label>
             <input
               type="range"
@@ -51,18 +68,18 @@ const ScriptInput: React.FC<ScriptInputProps> = ({ onStart }) => {
               step="1"
               value={scrollSpeed}
               onChange={(e) => setScrollSpeed(Number(e.target.value))}
-              className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+              className="w-full h-1.5 bg-slate-800 rounded-lg appearance-white cursor-pointer accent-indigo-500 hover:accent-indigo-400 transition-all"
             />
-            <div className="flex justify-between text-xs text-gray-500 mt-2">
+            <div className="flex justify-between text-[10px] font-black text-slate-600 uppercase tracking-widest px-1">
               <span>Slower</span>
               <span>Faster</span>
             </div>
           </div>
 
           {/* Font Size Control */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2 flex justify-between">
-              Font Size <span>{fontSize}px</span>
+          <div className="space-y-4">
+            <label className="text-sm font-semibold text-slate-400 flex justify-between px-1">
+              FONT SIZE <span>{fontSize}px</span>
             </label>
             <input
               type="range"
@@ -71,9 +88,9 @@ const ScriptInput: React.FC<ScriptInputProps> = ({ onStart }) => {
               step="2"
               value={fontSize}
               onChange={(e) => setFontSize(Number(e.target.value))}
-              className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+              className="w-full h-1.5 bg-slate-800 rounded-lg appearance-white cursor-pointer accent-indigo-500 hover:accent-indigo-400 transition-all"
             />
-            <div className="flex justify-between text-xs text-gray-500 mt-2">
+            <div className="flex justify-between text-[10px] font-black text-slate-600 uppercase tracking-widest px-1">
               <span>Small</span>
               <span>Large</span>
             </div>
@@ -82,9 +99,9 @@ const ScriptInput: React.FC<ScriptInputProps> = ({ onStart }) => {
 
         <button
           type="submit"
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 text-lg group shadow-lg shadow-indigo-500/20"
+          className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-5 rounded-2xl transition-all flex items-center justify-center gap-3 text-xl group shadow-xl shadow-indigo-500/20 active:scale-[0.98]"
         >
-          <span className="group-hover:animate-pulse">📹</span>
+          <span className="group-hover:scale-110 transition-transform">📹</span>
           Start Recording Mode
         </button>
       </form>

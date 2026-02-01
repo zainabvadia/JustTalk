@@ -6,6 +6,7 @@ import { RecordingResult } from '@/types';
 interface ResultsViewProps {
   result: RecordingResult;
   onReset: () => void;
+  onViewHistory: () => void;
 }
 
 const ResultsView: React.FC<ResultsViewProps> = ({ result, onReset }) => {
@@ -49,6 +50,14 @@ const ResultsView: React.FC<ResultsViewProps> = ({ result, onReset }) => {
         >
           New Recording
         </button>
+        <button 
+    onClick={onViewHistory} 
+    className="flex items-center gap-2 bg-slate-800 border border-slate-700 hover:border-indigo-500/50 px-8 py-3 rounded-xl font-bold text-slate-300"
+  >
+    <History className="w-5 h-5" />
+    All Versions
+  </button>
+        
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
