@@ -46,6 +46,9 @@ public class SessionController {
         try {
             // 1. Get AI Transcript
             String actualTranscript = assemblyService.transcribe(videoFile);
+            if (actualTranscript == null || actualTranscript.trim().isEmpty()) {
+                actualTranscript = "Transcription Failed";
+            }
 
             // 2. Compare script vs transcript
             AnalysisResult analysis = comparisonService.analyze(script, actualTranscript);
