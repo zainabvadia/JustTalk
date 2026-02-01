@@ -7,8 +7,6 @@ import justtalk.demo.service.AssemblyAIService;
 import justtalk.demo.service.ComparisonService;
 import justtalk.demo.model.Video;
 import justtalk.demo.service.VideoService;
-import justtalk.demo.model.Transcript;
-import justtalk.demo.service.TranscriptsService;
 
 import com.fasterxml.jackson.databind.ObjectMapper; // <--- FIXED TYPO IN YOUR IMPORT (fasterxml, not fasterxml)
 
@@ -27,19 +25,16 @@ public class SessionController {
     private final AssemblyAIService assemblyService;
     private final ComparisonService comparisonService;
     private final SessionRepository repository;
-    private final TranscriptsService transcriptsService;
     private final ObjectMapper mapper = new ObjectMapper();
 
     public SessionController(AssemblyAIService assemblyService, 
                              ComparisonService comparisonService, 
                              SessionRepository repository,
-                             VideoService videoService,
-                             TranscriptsService transcriptsService) {
+                             VideoService videoService) {
         this.assemblyService = assemblyService;
         this.comparisonService = comparisonService;
         this.repository = repository;
         this.videoService = videoService;
-        this.transcriptsService = transcriptsService;
     }
 
     @PostMapping("/analyze")
@@ -53,13 +48,6 @@ public class SessionController {
 
             // 2. Compare script vs transcript
             AnalysisResult analysis = comparisonService.analyze(script, actualTranscript);
-
-            // // 4. Store Transcript to DB
-            // Transcript transcriptEntity = new Transcript();
-            // transcriptEntity.setVideo(videoEntity.getVideoId());
-            // transcriptEntity.setTranscriptText(actualTranscript);
-            // transcriptEntity.setConfidenceScore(analysis.getAccuracyScore());
-            // transcriptsService.saveTranscript(transcriptEntity);
 
             // 3. Save Session to DB
             PracticeSession session = new PracticeSession();

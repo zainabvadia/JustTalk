@@ -18,8 +18,9 @@ public class VideoController {
     private final VideoService videoService;
 
     @PutMapping(value = "/new", consumes = "multipart/form-data", produces = "application/json")
-    public ResponseEntity<Video> uploadFile(@RequestParam("file") final MultipartFile file) throws IOException {
-        Video response = videoService.saveFile(file, user);
+    public ResponseEntity<Video> uploadFile(@RequestParam("file") final MultipartFile file,
+                                           @RequestParam("sessionId") final Long sessionId) throws IOException {
+        Video response = videoService.saveFile(file, sessionId);
         return ResponseEntity.ok(response);
     }
 
