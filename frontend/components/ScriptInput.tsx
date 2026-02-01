@@ -21,9 +21,8 @@ const ScriptInput: React.FC<ScriptInputProps> = ({ onStart }) => {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-gray-800 rounded-2xl shadow-2xl mt-10 border border-gray-700">
       <h2 className="text-3xl font-bold mb-6 flex items-center gap-3 text-indigo-400">
-        {/* Note: Ensure FontAwesome is loaded in your layout.tsx or use an icon library like lucide-react */}
         <span className="opacity-80">📜</span> 
-        Teleprompter Setup
+        Just Talk
       </h2>
       
       <form onSubmit={handleSubmit} className="space-y-6">
